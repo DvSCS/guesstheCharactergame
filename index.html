@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Game Character Guesser</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Game Character Guesser</h1>
+        <div id="game-info">
+            <p>Guess the character from video games!</p>
+            <p>Remaining guesses: <span id="guesses-left">5</span></p>
+        </div>
+        
+        <div id="game-input">
+            <input type="text" id="guess-input" placeholder="Enter character name...">
+            <button id="submit-guess">Guess!</button>
+        </div>
+
+        <div id="character-diagram">
+            <div class="mystery-character">
+                <div class="character-icon">
+                    <img src="https://via.placeholder.com/150?text=???" alt="Mystery Character">
+                </div>
+                <div class="character-name">???</div>
+            </div>
+            
+            <div id="connections-container">
+                <!-- Connections will be added here dynamically -->
+            </div>
+            
+            <div id="guessed-characters">
+                <!-- Guessed characters will be added here -->
+            </div>
+        </div>
+
+        <div id="hints-container">
+            <!-- Hints will be displayed here -->
+        </div>
+
+        <div id="history-container">
+            <!-- Previous guesses will be shown here -->
+        </div>
+
+        <div id="game-controls">
+            <button id="new-game">New Game</button>
+        </div>
+    </div>
+    <script src="js/api.js"></script>
+    <script src="database.js"></script>
+    <script src="game.js"></script>
+</body>
+</html> 
