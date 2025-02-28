@@ -1,5 +1,24 @@
-const API_KEY = 'YOUR_RAWG_API_KEY'; // You'll need to get an API key from https://rawg.io/apidocs
-const BACKUP_IMAGE_URL = 'https://via.placeholder.com/150';
+const CHARACTER_IMAGES = {
+    'Mario': 'https://i.imgur.com/KCnVHGX.png',
+    'Luigi': 'https://i.imgur.com/IzJbqHE.png',
+    'Bowser': 'https://i.imgur.com/bB5WFHG.png',
+    'Yoshi': 'https://i.imgur.com/XG4fHl5.png',
+    'Link': 'https://i.imgur.com/5LqNyRg.png',
+    'Zelda': 'https://i.imgur.com/YE1XHUI.png',
+    'Ganon': 'https://i.imgur.com/YWpQf1R.png',
+    'Steve': 'https://i.imgur.com/L4qX3Kd.png',
+    'Villager': 'https://i.imgur.com/YvQXmGF.png',
+    'Enderman': 'https://i.imgur.com/L9ziPWh.png'
+};
+
+const GAME_BACKGROUNDS = {
+    'Super Mario': 'https://i.imgur.com/8lKMJFb.jpg',
+    'The Legend of Zelda': 'https://i.imgur.com/Y7YtQYg.jpg',
+    'Minecraft': 'https://i.imgur.com/DQCUYjK.jpg'
+};
+
+const BACKUP_IMAGE_URL = 'https://i.imgur.com/XqaKHn8.png';
+const BACKUP_BG = 'https://i.imgur.com/8G6DGX9.jpg';
 
 class GameAPI {
     constructor() {
@@ -13,33 +32,14 @@ class GameAPI {
             return this.characterCache.get(cacheKey);
         }
 
-        try {
-            // Search for the game first
-            const gameResponse = await fetch(`https://api.rawg.io/api/games?key=${API_KEY}&search=${encodeURIComponent(gameName)}&page_size=1`);
-            const gameData = await gameResponse.json();
+        // Get predefined image or fallback
+        const imageUrl = CHARACTER_IMAGES[characterName] || BACKUP_IMAGE_URL;
+        this.characterCache.set(cacheKey, imageUrl);
+        return imageUrl;
+    }
 
-            if (gameData.results && gameData.results.length > 0) {
-                const gameId = gameData.results[0].id;
-                
-                // Get game screenshots that might contain the character
-                const screenshotsResponse = await fetch(`https://api.rawg.io/api/games/${gameId}/screenshots?key=${API_KEY}`);
-                const screenshotsData = await screenshotsResponse.json();
-
-                if (screenshotsData.results && screenshotsData.results.length > 0) {
-                    // Use the first screenshot as character representation
-                    const imageUrl = screenshotsData.results[0].image;
-                    this.characterCache.set(cacheKey, imageUrl);
-                    return imageUrl;
-                }
-            }
-
-            // Fallback to backup image if no game screenshots found
-            this.characterCache.set(cacheKey, BACKUP_IMAGE_URL);
-            return BACKUP_IMAGE_URL;
-        } catch (error) {
-            console.error('Error fetching character image:', error);
-            return BACKUP_IMAGE_URL;
-        }
+    async searchGameBackground(gameName) {
+        return GAME_BACKGROUNDS[gameName] || BACKUP_BG;
     }
 
     calculateProximityScore(char1, char2) {

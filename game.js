@@ -136,50 +136,45 @@ class CharacterGuessingGame {
     }
     
     async addCharacterToDiagram(characterName, gameName, proximityScore, proximityColor, characterData) {
-        const angle = (this.guessedCharacters.size - 1) * (360 / this.maxGuesses);
-        const radius = 300;
+        const size = this.guessedCharacters.size;
+        let x, y;
         
-        // Calculate base position
-        const x = Math.cos(angle * Math.PI / 180) * radius;
-        const y = Math.sin(angle * Math.PI / 180) * radius;
+        // Posicionamento em duas linhas, evitando o centro
+        const centerBuffer = 150; // Espaço reservado para o personagem mistério
+        
+        if (size <= 2) {
+            // Primeiros dois cards vão para a esquerda em alturas diferentes
+            x = -350;
+            y = size === 1 ? -80 : 80;
+        } else if (size <= 4) {
+            // Próximos dois cards vão para a direita em alturas diferentes
+            x = 350;
+            y = size === 3 ? -80 : 80;
+        } else {
+            // Cards adicionais alternam entre esquerda e direita, expandindo para fora
+            const side = size % 2 === 1 ? -1 : 1; // Alterna entre esquerda (-1) e direita (1)
+            const offset = Math.floor((size - 4) / 2) * 180; // Aumenta o deslocamento a cada par de cards
+            x = (350 + offset) * side;
+            y = size % 4 <= 1 ? -80 : 80;
+        }
         
         // Create character element
         const characterElement = document.createElement('div');
         characterElement.className = 'guessed-character';
         characterElement.dataset.character = characterName;
         
-        // Adjust position based on quadrant to prevent overflow
-        const quadrant = Math.floor((angle + 45) / 90) % 4;
-        let xOffset = 0;
-        let yOffset = 0;
-        
-        switch(quadrant) {
-            case 0: // Top right
-                xOffset = -160;
-                break;
-            case 1: // Bottom right
-                xOffset = -160;
-                yOffset = -100;
-                break;
-            case 2: // Bottom left
-                yOffset = -100;
-                break;
-            case 3: // Top left
-                break;
-        }
-        
-        const finalX = x + xOffset;
-        const finalY = y + yOffset;
-        
         // Set position variables for CSS
-        characterElement.style.setProperty('--x', `${finalX}px`);
-        characterElement.style.setProperty('--y', `${finalY}px`);
-        characterElement.style.transform = `translate(${finalX}px, ${finalY}px)`;
+        characterElement.style.setProperty('--x', `${x}px`);
+        characterElement.style.setProperty('--y', `${y}px`);
+        characterElement.style.transform = `translate(calc(-50% + ${x}px), calc(-50% + ${y}px))`;
         
-        // Get character image
-        const imageUrl = await this.gameAPI.searchCharacterImage(characterName, gameName);
-        
-        // Create attributes HTML
+        // Get character image and game background
+        const [characterImage, gameBackground] = await Promise.all([
+            this.gameAPI.searchCharacterImage(characterName, gameName),
+            this.gameAPI.searchGameBackground(gameName)
+        ]);
+
+        // Create attributes HTML with horizontal layout
         const attributes = [];
         for (const attr in characterData) {
             const targetValue = this.targetCharacterData[attr];
@@ -195,8 +190,8 @@ class CharacterGuessingGame {
         }
         
         characterElement.innerHTML = `
-            <div class="character-icon">
-                <img src="${imageUrl}" alt="${characterName}">
+            <div class="character-icon" ${gameBackground ? `style="background-image: url('${gameBackground}');"` : ''}>
+                <img src="${characterImage}" alt="${characterName}">
             </div>
             <div class="character-info">
                 <div class="character-name">${characterName}</div>
@@ -208,38 +203,32 @@ class CharacterGuessingGame {
         
         this.guessedCharactersContainer.appendChild(characterElement);
         
-        // Create connection to center (mystery character)
-        this.createConnection(
-            { x: 0, y: 0 },
-            { x: finalX + 60, y: finalY + 60 },
-            proximityScore,
-            proximityColor,
-            'center-' + characterName
-        );
-        
-        // Create connections to other characters
-        const allCharacters = this.guessedCharactersContainer.querySelectorAll('.guessed-character');
-        allCharacters.forEach(otherCharacter => {
-            if (otherCharacter !== characterElement) {
-                const otherName = otherCharacter.dataset.character;
-                const otherData = this.findCharacterData(otherName);
-                if (otherData) {
-                    const score = this.gameAPI.calculateProximityScore(characterData, otherData.data);
-                    const color = this.gameAPI.getProximityColor(score);
-                    
-                    const otherX = parseFloat(otherCharacter.style.getPropertyValue('--x')) + 60;
-                    const otherY = parseFloat(otherCharacter.style.getPropertyValue('--y')) + 60;
-                    
-                    this.createConnection(
-                        { x: finalX + 60, y: finalY + 60 },
-                        { x: otherX, y: otherY },
-                        score,
-                        color,
-                        `${characterName}-${otherName}`
-                    );
-                }
+        // Não cria conexão para o primeiro card
+        if (size > 1) {
+            // Pega o card anterior
+            const allCharacters = Array.from(this.guessedCharactersContainer.querySelectorAll('.guessed-character'));
+            const previousCharacter = allCharacters[allCharacters.length - 2];
+            const previousName = previousCharacter.dataset.character;
+            const previousData = this.findCharacterData(previousName);
+            
+            if (previousData) {
+                const previousX = parseFloat(previousCharacter.style.getPropertyValue('--x'));
+                const previousY = parseFloat(previousCharacter.style.getPropertyValue('--y'));
+                
+                // Calcula similaridade entre os personagens
+                const score = this.gameAPI.calculateProximityScore(characterData, previousData.data);
+                const color = this.gameAPI.getProximityColor(score);
+                
+                // Cria conexão com o card anterior
+                this.createConnection(
+                    { x: previousX, y: previousY },
+                    { x, y },
+                    score,
+                    color,
+                    `${characterName}-${previousName}`
+                );
             }
-        });
+        }
     }
     
     createConnection(from, to, score, color, id) {
@@ -252,23 +241,22 @@ class CharacterGuessingGame {
         const dx = to.x - from.x;
         const dy = to.y - from.y;
         const length = Math.sqrt(dx * dx + dy * dy);
-        const angle = Math.atan2(dy, dx);
+        const angle = Math.atan2(dy, dx) * (180 / Math.PI);
         
         // Apply line styles
         line.style.width = `${length}px`;
-        line.style.transform = `translate(${from.x + 100}px, ${from.y + 100}px) rotate(${angle}rad)`;
+        line.style.transform = `translate(${from.x}px, ${from.y}px) rotate(${angle}deg)`;
         line.style.color = color;
         
         // Add proximity score
         const scoreElement = document.createElement('div');
         scoreElement.className = 'connection-score';
-        scoreElement.textContent = `#${score}`;
+        scoreElement.textContent = `${Math.floor((score / 1000) * 100)}%`;
         
         // Position score at the midpoint of the line
         const midX = from.x + dx / 2;
         const midY = from.y + dy / 2;
-        scoreElement.style.left = `${midX + 100}px`;
-        scoreElement.style.top = `${midY + 100}px`;
+        scoreElement.style.transform = `translate(${midX}px, ${midY}px)`;
         
         this.connectionsContainer.appendChild(line);
         this.connectionsContainer.appendChild(scoreElement);

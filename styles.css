@@ -108,65 +108,13 @@ button:active {
 /* Character Diagram Styles */
 #character-diagram {
     position: relative;
-    min-height: 800px;
-    margin: 3rem 0;
+    min-height: 400px;
+    margin: 2rem 0;
     background: linear-gradient(to bottom, #1a1a1a 0%, #000000 100%);
     border-radius: 20px;
-    padding: 4rem;
+    padding: 2rem;
     overflow: hidden;
     box-shadow: inset 0 0 50px rgba(0, 0, 0, 0.5);
-}
-
-.mystery-character {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    text-align: center;
-    z-index: 10;
-    transition: all 0.3s ease;
-}
-
-.mystery-character:hover {
-    transform: translate(-50%, -50%) scale(1.05);
-}
-
-.mystery-character .character-icon {
-    width: 200px;
-    height: 200px;
-    border-width: 4px;
-    box-shadow: 0 0 30px rgba(76, 175, 80, 0.3);
-}
-
-.character-icon {
-    width: 120px;
-    height: 120px;
-    margin: 0 auto;
-    border-radius: 50%;
-    overflow: hidden;
-    border: 3px solid var(--primary-color);
-    transition: all 0.3s ease;
-    background: var(--bg-medium);
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
-}
-
-.character-icon img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    transition: transform 0.3s ease;
-}
-
-.character-icon:hover img {
-    transform: scale(1.1);
-}
-
-.character-name {
-    margin-top: 1rem;
-    font-weight: bold;
-    color: var(--text-light);
-    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
-    font-size: 1.2rem;
 }
 
 #connections-container {
@@ -179,86 +127,191 @@ button:active {
     z-index: 1;
 }
 
-.connection-line {
-    position: absolute;
-    height: 4px;
-    background: linear-gradient(90deg, 
-        rgba(255,255,255,0.2) 0%, 
-        currentColor 50%, 
-        rgba(255,255,255,0.2) 100%
-    );
-    transform-origin: 0 50%;
-    transition: all 0.3s ease;
-    filter: drop-shadow(0 0 8px currentColor);
-    opacity: 0.8;
-    z-index: 2;
-}
-
-.connection-line[data-id^="center-"] {
-    opacity: 1;
-    height: 5px;
-    background: linear-gradient(90deg, 
-        currentColor 0%, 
-        currentColor 100%
-    );
-}
-
-.connection-score {
-    position: absolute;
-    background: rgba(20, 20, 20, 0.95);
-    padding: 0.6rem 1.2rem;
-    border-radius: 20px;
-    font-size: 1rem;
-    font-weight: 600;
-    transform: translate(-50%, -50%);
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
-    z-index: 3;
-    backdrop-filter: blur(5px);
-    border: 2px solid currentColor;
-    white-space: nowrap;
-    color: var(--text-light);
-    transition: all 0.3s ease;
-    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
-}
-
 #guessed-characters {
     position: absolute;
-    width: calc(100% - 8rem);
-    height: calc(100% - 8rem);
-    top: 4rem;
-    left: 4rem;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
     z-index: 2;
-    transform-style: preserve-3d;
-    perspective: 1000px;
+}
+
+.mystery-character {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    text-align: center;
+    z-index: 10;
+    transition: all 0.3s ease;
+    background: rgba(45, 45, 45, 0.95);
+    padding: 1rem;
+    border-radius: 12px;
+    box-shadow: 0 0 30px rgba(0, 0, 0, 0.5);
+    border: 2px solid var(--primary-color);
+}
+
+.mystery-character .character-icon {
+    width: 80px;
+    height: 80px;
+    margin-bottom: 0.5rem;
+    border-width: 3px;
+}
+
+.mystery-character .character-name {
+    font-size: 1.2rem;
+    margin: 0;
+    color: var(--text-light);
 }
 
 .guessed-character {
     position: absolute;
-    width: 320px;
+    width: 180px;
     display: flex;
     align-items: flex-start;
-    gap: 1.2rem;
-    background: rgba(20, 20, 20, 0.95);
-    padding: 1.2rem;
-    border-radius: 16px;
+    gap: 0.5rem;
+    background: rgba(45, 45, 45, 0.95);
+    padding: 0.4rem;
+    border-radius: 8px;
     box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4);
     animation: fadeIn 0.5s ease;
     border: 1px solid rgba(255, 255, 255, 0.1);
     backdrop-filter: blur(10px);
     transform-origin: center center;
     transition: all 0.3s ease;
+    top: 50%;
+    left: 50%;
+}
+
+.character-icon {
+    width: 40px;
+    height: 40px;
+    flex-shrink: 0;
+    border-radius: 50%;
+    overflow: hidden;
+    border: 2px solid var(--primary-color);
+    transition: all 0.3s ease;
+    background: var(--bg-medium);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+    position: relative;
+    background-size: cover;
+    background-position: center;
+}
+
+.character-icon::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: inherit;
+    filter: blur(5px);
+    opacity: 0.5;
+    z-index: 0;
+}
+
+.character-icon img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.3s ease;
+    position: relative;
+    z-index: 1;
+}
+
+.character-icon:hover img {
+    transform: scale(1.1);
+}
+
+.character-info {
+    flex: 1;
+    min-width: 0;
+}
+
+.character-name {
+    margin: 0 0 0.2rem 0;
+    font-weight: bold;
+    color: var(--text-light);
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+    font-size: 0.85rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.attributes {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.1rem;
+    font-size: 0.7rem;
+}
+
+.attribute {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+    padding: 0.1rem 0.3rem;
+    background: rgba(0, 0, 0, 0.2);
+    border-radius: 4px;
+    margin-right: 0.2rem;
+    margin-bottom: 0.2rem;
+    font-size: 0.7rem;
+    white-space: nowrap;
+}
+
+.attribute .emoji {
+    width: 14px;
+    height: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.7rem;
+}
+
+.connection-line {
+    position: absolute;
+    height: 2px;
+    background: linear-gradient(90deg, 
+        rgba(255,255,255,0.1) 0%, 
+        currentColor 50%, 
+        rgba(255,255,255,0.1) 100%
+    );
+    transform-origin: 0 0;
+    transition: all 0.3s ease;
+    filter: drop-shadow(0 0 8px currentColor);
+    opacity: 0.6;
+    left: 50%;
+    top: 50%;
+}
+
+.connection-line[data-id^="center-"] {
+    opacity: 0.8;
+    height: 4px;
+}
+
+.connection-score {
+    position: absolute;
+    background: rgba(45, 45, 45, 0.95);
+    padding: 0.2rem 0.6rem;
+    border-radius: 12px;
+    font-size: 0.7rem;
+    font-weight: 600;
+    transform: translate(-50%, -50%);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+    z-index: 3;
+    backdrop-filter: blur(5px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    white-space: nowrap;
+    color: var(--text-light);
+    transition: all 0.3s ease;
+    left: 50%;
+    top: 50%;
 }
 
 .guessed-character:hover {
     transform: scale(1.05) !important;
     z-index: 15;
-    border-color: currentColor;
-    box-shadow: 0 0 30px rgba(255, 255, 255, 0.1);
-}
-
-.guessed-character:hover .character-icon {
-    border-color: currentColor;
-    box-shadow: 0 0 20px currentColor;
 }
 
 .guessed-character:hover ~ #connections-container .connection-line {
@@ -267,65 +320,28 @@ button:active {
 
 .guessed-character:hover ~ #connections-container .connection-line[data-id*="${attr('data-character')}"] {
     opacity: 1;
-    height: 6px;
-    filter: drop-shadow(0 0 15px currentColor);
+    height: 5px;
+    filter: drop-shadow(0 0 12px currentColor);
 }
 
-.connection-line:hover,
-.connection-line:hover + .connection-score {
-    z-index: 20;
+.guessed-character:hover ~ #connections-container .connection-score {
+    transform: translate(-50%, -50%) scale(0.8);
+    opacity: 0.5;
 }
 
-.connection-score:hover {
-    transform: translate(-50%, -50%) scale(1.2);
-    z-index: 20;
-}
-
-.guessed-character .character-info {
-    flex: 1;
-    text-align: left;
-}
-
-.guessed-character .character-name {
-    margin: 0 0 0.8rem 0;
-    font-size: 1.2rem;
-    color: var(--primary-color);
-}
-
-.guessed-character .attributes {
-    font-size: 0.95rem;
-}
-
-.attribute {
-    display: flex;
-    align-items: center;
-    gap: 0.8rem;
-    margin-bottom: 0.5rem;
-    padding: 0.3rem 0;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-}
-
-.attribute:last-child {
-    border-bottom: none;
-}
-
-.attribute .emoji {
-    width: 24px;
-    height: 24px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 1rem;
+.guessed-character:hover ~ #connections-container .connection-line[data-id*="${attr('data-character')}"] + .connection-score {
+    transform: translate(-50%, -50%) scale(1.1);
+    opacity: 1;
 }
 
 @keyframes fadeIn {
     0% {
         opacity: 0;
-        transform: translate(var(--x), var(--y)) scale(0.8);
+        transform: translate(calc(-50% + var(--x)), calc(-50% + var(--y))) scale(0.8);
     }
     100% {
         opacity: 1;
-        transform: translate(var(--x), var(--y)) scale(1);
+        transform: translate(calc(-50% + var(--x)), calc(-50% + var(--y))) scale(1);
     }
 }
 
